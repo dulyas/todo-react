@@ -1,0 +1,95 @@
+.todo {
+	padding: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	position: relative;
+
+	.mini-loader {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 2;
+		pointer-events: all;
+		background: rgba(0, 0, 0, 0.178);
+		:global(svg) {
+			height: 20px;
+		}
+	}
+
+	input {
+		// display: block;
+		width: 15px;
+		height: 15px;
+		margin-inline-end: 10px;
+	}
+	&:first-child {
+		border-block-start: 1px solid grey;
+	}
+	&:nth-child(odd) {
+		background: rgb(231, 231, 231);
+	}
+	border-block-end: 1px solid grey;
+	border-inline-start: 1px solid grey;
+	border-inline-end: 1px solid grey;
+
+	.left {
+		display: flex;
+		align-items: center;
+		.title {
+			background: none;
+			width: 100%;
+			pointer-events: none;
+			padding: 10px;
+			border-radius: 5px;
+			&::placeholder {
+				color: black;
+			}
+			&.on-edit {
+				pointer-events: all;
+				background: #fff;
+			}
+		}
+	}
+
+	.icons {
+		justify-self: flex;
+		display: flex;
+		align-items: center;
+		button {
+			width: 30px;
+			height: 30px;
+			padding: 5px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			cursor: pointer;
+			opacity: 0.8;
+			transition: 0.3s opacity;
+			&:hover {
+				opacity: 1;
+			}
+			&.edit {
+				background: green;
+				border-radius: 5px;
+				:global(svg) {
+					stroke: #fff;
+				}
+			}
+			&.delete {
+				margin-inline-start: 5px;
+				background: red;
+				border-radius: 5px;
+				:global(svg) {
+					fill: #fff;
+				}
+			}
+		}
+	}
+}

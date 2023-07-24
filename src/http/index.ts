@@ -1,8 +1,8 @@
 import axios from "axios";
-import { AuthResponse } from "@/models/response/AuthResponse";
+import { IAuthResponse } from "@/models/AuthResponse";
 
-// export const API_URL = "http://localhost:4422/api";
-export const API_URL = "http://dulyas.fun/chat-back";
+export const API_URL = "http://localhost:9999";
+// export const API_URL = "http://dulyas.fun/todo-express";
 
 const $api = axios.create({
 	withCredentials: true,
@@ -23,14 +23,14 @@ $api.interceptors.response.use(
 		if (err.response.status == 401 && err.config && !err.config._isRetry) {
 			originalRequest._isRetry = true;
 			try {
-				const response = await axios.get<AuthResponse>(
+				const response = await axios.get<IAuthResponse>(
 					`${API_URL}/user/refresh`,
 					{ withCredentials: true },
 				);
 				localStorage.setItem("token", response.data.accessToken);
 				return $api.request(originalRequest);
 			} catch (error) {
-				console.log("не авторизован");
+				console.log("Not Authorized");
 			}
 		}
 		throw err;

@@ -1,11 +1,11 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Todos from "./components/Todos";
-import Login from "./components/Login";
+import TodoPage from "./routes/Todos/TodoPage";
+import Login from "./routes/Login/Login";
 
 const router = createBrowserRouter([
 	{
 		path: "/",
-		element: <Todos />,
+		element: <TodoPage />,
 	},
 	{
 		path: "/login",

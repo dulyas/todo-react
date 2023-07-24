@@ -4,23 +4,24 @@ import { AxiosResponse } from "axios";
 
 export default class AuthService {
 	static async login(
-		email: string,
+		name: string,
 		password: string,
+		keepLogin: boolean,
 	): Promise<AxiosResponse<IAuthResponse>> {
-		return $api.post<IAuthResponse>("/user/login", { email, password });
-	}
-
-	static async registration(
-		email: string,
-		password: string,
-	): Promise<AxiosResponse<IAuthResponse>> {
-		return $api.post<IAuthResponse>("/user/registration", {
-			email,
+		return $api.post<IAuthResponse>("/user/login", {
+			name,
 			password,
+			keepLogin,
 		});
 	}
 
 	static async logout(): Promise<AxiosResponse<IAuthResponse>> {
 		return $api.post("/user/logout");
+	}
+
+	static async refresh(): Promise<AxiosResponse<IAuthResponse>> {
+		return $api.get<IAuthResponse>(`/user/refresh`, {
+			withCredentials: true,
+		});
 	}
 }

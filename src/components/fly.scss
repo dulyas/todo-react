@@ -1,0 +1,18 @@
+.fly-enter {
+	opacity: 0;
+	transform: translate(100%);
+}
+.fly-enter-active {
+	opacity: 1;
+	transform: translateX(0);
+	transition: opacity 300ms, transform 300ms;
+}
+
+.fly-exit {
+	opacity: 1;
+}
+.fly-exit-active {
+	opacity: 0;
+	transform: translate(100%);
+	transition: opacity 300ms, transform 300ms;
+}
