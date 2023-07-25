@@ -1,10 +1,30 @@
 .todo {
 	padding: 20px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
 	width: 100%;
+	border-block-end: 1px solid grey;
+	border-inline-start: 1px solid grey;
+	border-inline-end: 1px solid grey;
 	position: relative;
+	.wrap {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.info {
+		font-size: 12px;
+		margin-block-end: 5px;
+		display: flex;
+		justify-content: space-between;
+		&-item {
+			display: flex;
+		}
+	}
+
+	svg {
+		width: 20px;
+		height: 20px;
+	}
 
 	.mini-loader {
 		position: absolute;
@@ -24,24 +44,25 @@
 	}
 
 	input {
-		// display: block;
 		width: 15px;
 		height: 15px;
 		margin-inline-end: 10px;
+		&.disabled {
+			pointer-events: none;
+		}
 	}
 	&:first-child {
 		border-block-start: 1px solid grey;
 	}
-	&:nth-child(odd) {
+	&.done {
 		background: rgb(231, 231, 231);
 	}
-	border-block-end: 1px solid grey;
-	border-inline-start: 1px solid grey;
-	border-inline-end: 1px solid grey;
 
 	.left {
 		display: flex;
 		align-items: center;
+		width: 100%;
+		margin-inline-end: 5px;
 		.title {
 			background: none;
 			width: 100%;
@@ -84,6 +105,7 @@
 			}
 			&.delete {
 				margin-inline-start: 5px;
+
 				background: red;
 				border-radius: 5px;
 				:global(svg) {

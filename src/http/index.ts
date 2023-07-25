@@ -1,8 +1,8 @@
 import axios from "axios";
-import { IAuthResponse } from "@/models/AuthResponse";
+import { IAuthResponse } from "@/models/IAuthResponse";
 
-export const API_URL = "http://localhost:9999";
-// export const API_URL = "http://dulyas.fun/todo-express";
+// export const API_URL = "http://localhost:9999";
+export const API_URL = "http://dulyas.fun/todo-express";
 
 const $api = axios.create({
 	withCredentials: true,

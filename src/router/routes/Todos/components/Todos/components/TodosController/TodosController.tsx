@@ -1,50 +1,65 @@
-import { useRef, useState, useContext } from "react";
+import { useRef, useState, useContext, useEffect, ChangeEvent } from "react";
 import style from "./todos-controller.module.scss";
 import { Context } from "@/main";
 import { useSearchParams } from "react-router-dom";
+import { ISortFilterType } from "@/models/ISortFilters";
+import { observer } from "mobx-react-lite";
+import { Pagination } from "@mui/material";
 
-type Tab = "Add" | "Filter";
+type Tab = "Add" | "Sort";
 
-type FilterType = "disabled" | "up" | "down";
-
-interface Filters {
-	title: FilterType;
-	email: FilterType;
-	username: FilterType;
-}
+const headersButtons = [
+	{
+		title: "Add",
+	},
+	{
+		title: "Sort",
+	},
+];
 
 const TodosController = () => {
-	const newTodoTitleElem = useRef<HTMLInputElement | null>(null);
+	const newTodoStatusElem = useRef<HTMLInputElement | null>(null);
 	const newTodoUsernameElem = useRef<HTMLInputElement | null>(null);
 	const newTodoEmailElem = useRef<HTMLInputElement | null>(null);
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [filters, setFilters] = useState<Filters>({
-		title: (searchParams.get("title") as FilterType) ?? "disabled",
-		email: (searchParams.get("email") as FilterType) ?? "disabled",
-		username: (searchParams.get("username") as FilterType) ?? "disabled",
-	});
-	const [page, setPage] = useState<string | number>(
-		searchParams.get("page") ?? 1,
-	);
 
-	const { todoStore, errorStore } = useContext(Context);
+	const { todoStore, errorStore, messageStore } = useContext(Context);
 
-	const [activeTab, setActiveTab] = useState<Tab>("Filter");
+	const [activeTab, setActiveTab] = useState<Tab>("Add");
 
-	const onClickCreateTodo = () => {
+	const onClickCreateTodo = async () => {
+		if (
+			newTodoEmailElem.current?.value &&
+			!newTodoEmailElem.current?.value.match(/.+@.+\..+/i)
+		) {
+			return errorStore.setErrorMessage("Not Valid Email");
+		}
+
 		for (const input of inputs) {
-			console.log(input);
 			if (!input.ref.current?.value)
 				return errorStore.setErrorMessage(
 					`${input.title} cant be empty`,
 				);
 		}
+
+		try {
+			await todoStore.createTodo(
+				newTodoStatusElem.current!.value,
+				newTodoEmailElem.current!.value,
+				newTodoUsernameElem.current!.value,
+			);
+			messageStore.setMessage("Todo added!");
+		} catch (e: any) {
+			errorStore.setErrorMessage(
+				e?.response?.data?.message || e?.message,
+			);
+		}
 	};
 
 	const inputs = [
 		{
-			title: "Title",
-			ref: newTodoTitleElem,
+			title: "Text",
+			ref: newTodoStatusElem,
 		},
 		{
 			title: "Username",
@@ -56,17 +71,8 @@ const TodosController = () => {
 		},
 	];
 
-	const headersButtons = [
-		{
-			title: "Add",
-		},
-		{
-			title: "Filter",
-		},
-	];
-
-	const onClickFilter = (title: string, value: FilterType) => {
-		const calcNextValue = (value: FilterType): FilterType => {
+	const onClickFilter = (title: string, value: ISortFilterType) => {
+		const calcNextValue = (value: ISortFilterType): ISortFilterType => {
 			if (value === "up") return "down";
 			if (value === "down") return "disabled";
 			return "up";
@@ -74,24 +80,68 @@ const TodosController = () => {
 
 		const nextValue = calcNextValue(value);
 
-		setFilters((prev) => ({
-			...prev,
-			[title]: nextValue,
-		}));
+		todoStore.setSortFilters({ [title]: nextValue });
 
 		setSearchParams({
-			...filters,
+			...todoStore.sortFilters,
 			[title]: nextValue,
+			page: String(todoStore.page),
 		});
+		todoStore.getTodos();
 	};
+
+	const handleChangePage = (e: ChangeEvent<unknown>, value: number) => {
+		setSearchParams({
+			...todoStore.sortFilters,
+			page: String(value),
+		});
+		todoStore.setPage(value);
+		todoStore.getTodos();
+	};
+
+	useEffect(() => {
+		try {
+			const querySortParams = {
+				status:
+					(searchParams.get("status") as ISortFilterType) ||
+					"disabled",
+				username:
+					(searchParams.get("username") as ISortFilterType) ||
+					"disabled",
+				email:
+					(searchParams.get("email") as ISortFilterType) ||
+					"disabled",
+			};
+
+			todoStore.setPage(searchParams.get("page") || 1);
+
+			todoStore.setSortFilters(querySortParams);
+
+			setSearchParams({
+				...todoStore.sortFilters,
+				page: String(todoStore.page),
+			});
+			todoStore.getTodos();
+		} catch (e: any) {
+			errorStore.setErrorMessage(e?.message);
+		}
+	}, []);
 
 	return (
 		<>
+			<div className={style.pagination}>
+				<Pagination
+					count={todoStore.pages}
+					page={+todoStore.page}
+					onChange={handleChangePage}
+				/>
+			</div>
 			<div className={style.header}>
 				<div>Todos ({todoStore.todos.length})</div>
 				<div className={style["header-btns"]}>
 					{headersButtons.map(({ title }) => (
 						<div
+							key={title}
 							onClick={() => setActiveTab(title as Tab)}
 							className={`${style["btn"]} ${
 								title === activeTab ? style.active : ""
@@ -122,26 +172,26 @@ const TodosController = () => {
 						</button>
 					</>
 				)}
-				{activeTab === "Filter" && (
+				{activeTab === "Sort" && (
 					<>
 						<div className={style.filter}>
-							{Object.entries(filters).map(([title, value]) => (
-								<div
-									onClick={() =>
-										onClickFilter(
-											title,
-											value as FilterType,
-										)
-									}
-									className={`${style["filter-btn"]} ${style[value]}`}
-								>
-									{title}
-								</div>
-							))}
+							{Object.entries(todoStore.sortFilters).map(
+								([title, value]) => (
+									<div
+										key={title}
+										onClick={() =>
+											onClickFilter(
+												title,
+												value as ISortFilterType,
+											)
+										}
+										className={`${style["filter-btn"]} ${style[value]}`}
+									>
+										{title}
+									</div>
+								),
+							)}
 						</div>
-						<button className={`blue-btn ${style.submit}`}>
-							Filter!
-						</button>
 					</>
 				)}
 			</div>
@@ -149,4 +199,4 @@ const TodosController = () => {
 	);
 };
 
-export default TodosController;
+export default observer(TodosController);

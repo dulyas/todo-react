@@ -26,7 +26,7 @@ const TodoPage = () => {
 					onClick={onClickAuth}
 					className={`blue-btn ${style.logout}`}
 				>
-					{userStore.user ? "Logout" : "Login"}
+					{userStore.user ? "Log Out" : "Login"}
 				</button>
 			</header>
 			<div className={style.todos}>

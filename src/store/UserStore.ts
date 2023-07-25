@@ -19,15 +19,20 @@ export default class UserStore {
 	}
 
 	async login(login: string, password: string, keepMeCheckBoxValue: boolean) {
-		const response = await AuthService.login(
-			login,
-			password,
-			keepMeCheckBoxValue,
-		);
+		try {
+			this.setLoading(true);
+			const response = await AuthService.login(
+				login,
+				password,
+				keepMeCheckBoxValue,
+			);
 
-		localStorage.setItem("token", response.data.accessToken);
+			localStorage.setItem("token", response.data.accessToken);
 
-		this.setUser(response.data.user);
+			this.setUser(response.data.user);
+		} finally {
+			this.setLoading(false);
+		}
 	}
 
 	async logout() {

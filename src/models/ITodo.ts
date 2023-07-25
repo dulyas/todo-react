@@ -4,4 +4,5 @@ export interface ITodo {
 	email: string;
 	title: string;
 	done: boolean;
+	edited: boolean;
 }

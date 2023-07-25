@@ -3,6 +3,8 @@ import usePreventDefault from "@/hooks/usePreventDefault";
 import { ChangeEvent, MouseEvent, useState, useContext } from "react";
 import { Context } from "@/main";
 import { useNavigate } from "react-router-dom";
+import Loader from "@/components/Loader/Loader";
+import { observer } from "mobx-react-lite";
 
 const Login = () => {
 	const { errorStore, userStore } = useContext(Context);
@@ -12,7 +14,7 @@ const Login = () => {
 	const navigate = useNavigate();
 
 	const [keepMeCheckBoxValue, setKeepMeCheckBoxValue] =
-		useState<boolean>(false);
+		useState<boolean>(true);
 
 	const toggleCheckBoxValue = (e: MouseEvent) => {
 		e.preventDefault();
@@ -24,11 +26,9 @@ const Login = () => {
 		try {
 			await userStore.login(name, password, keepMeCheckBoxValue);
 			navigate("/");
-		} catch (error: any) {
+		} catch (e: any) {
 			errorStore.setErrorMessage(
-				error.response?.data?.message ||
-					error?.message ||
-					"Unexpected Error",
+				e.response?.data?.message || e?.message || "Unexpected Error",
 			);
 		}
 	};
@@ -43,6 +43,11 @@ const Login = () => {
 
 	return (
 		<div className={style.lay}>
+			{userStore.isLoading && (
+				<div className={style.loader}>
+					<Loader />
+				</div>
+			)}
 			<div className={style.login}>
 				<div className={style["tabs"] + " " + style["selected-login"]}>
 					<button className="tab">SIGN IN</button>
@@ -92,4 +97,4 @@ const Login = () => {
 	);
 };
 
-export default Login;
+export default observer(Login);

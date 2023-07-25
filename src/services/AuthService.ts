@@ -1,4 +1,4 @@
-import { IAuthResponse } from "@/models/AuthResponse";
+import { IAuthResponse } from "@/models/IAuthResponse";
 import $api from "@/http";
 import { AxiosResponse } from "axios";
 
