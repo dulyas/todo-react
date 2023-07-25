@@ -1,4 +1,4 @@
-import { FC, useRef, useState, useContext, ChangeEvent } from "react";
+import { FC, useState, useContext, ChangeEvent } from "react";
 import style from "./todo.module.scss";
 import { EditIcon, DeleteIcon, SaveIcon, MiniLoader } from "./svgs";
 import { Context } from "@/main";

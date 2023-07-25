@@ -90,7 +90,7 @@ const TodosController = () => {
 		todoStore.getTodos();
 	};
 
-	const handleChangePage = (e: ChangeEvent<unknown>, value: number) => {
+	const handleChangePage = (_e: ChangeEvent<unknown>, value: number) => {
 		setSearchParams({
 			...todoStore.sortFilters,
 			page: String(value),
