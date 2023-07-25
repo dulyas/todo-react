@@ -1,4 +1,4 @@
-import { FC, useState, useContext, ChangeEvent } from "react";
+import { FC, useState, useContext, ChangeEvent, useRef } from "react";
 import style from "./todo.module.scss";
 import { EditIcon, DeleteIcon, SaveIcon, MiniLoader } from "./svgs";
 import { Context } from "@/main";
@@ -17,11 +17,12 @@ const Todo: FC<TodoProps> = ({ title, username, email, id, done, edited }) => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [onEdit, setOnEdit] = useState<boolean>(false);
 	const [titleValue, setTitleValue] = useState<string>(title);
+	const textInput = useRef<HTMLInputElement | null>(null);
 
 	const { userStore, errorStore, todoStore } = useContext(Context);
 
 	const errorHandler = (e: any) => {
-		if (e.response?.status === 401) {
+		if (e?.response?.status === 401) {
 			userStore.user = null;
 			return errorStore.setErrorMessage(
 				"Unathorizited error, please login again",
@@ -48,6 +49,7 @@ const Todo: FC<TodoProps> = ({ title, username, email, id, done, edited }) => {
 	const onClickEdit = async () => {
 		if (!onEdit) {
 			setOnEdit(true);
+			textInput.current!.focus();
 		} else {
 			if (!titleValue)
 				return errorStore.setErrorMessage("Todo title cant be empty");
@@ -100,6 +102,7 @@ const Todo: FC<TodoProps> = ({ title, username, email, id, done, edited }) => {
 
 						<input
 							onChange={onChangeTitle}
+							ref={textInput}
 							value={titleValue}
 							className={`${style.title} ${
 								onEdit ? style["on-edit"] : ""
